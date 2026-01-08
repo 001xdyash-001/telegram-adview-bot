@@ -41,7 +41,7 @@ def start(update, context):
     "💰 /run Earn Coins – Start earning\n"
     "❌ /cancel To Stop Coin Earning\n\n"
     "📌 How It Works\n"
-    "1️⃣ Join our official channel\n"
+    "1️⃣ Join our official channel Then Register at AdView: https://adview.in/auth?ref=26GKB9\n"
     "2️⃣ Send /run command\n"
     "3️⃣ Register using your AdView credentials\n"
     "4️⃣ Bot automatically watches videos\n"
@@ -148,5 +148,6 @@ dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
 updater.start_polling()
 updater.idle()
+
 
 
