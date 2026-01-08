@@ -62,15 +62,21 @@ def start(update, context):
     save_user(user_id)
 
     update.message.reply_text(
-        "✨ AdView Bot – Earn Coins Automatically! ✨\n\n"
-        "🚀 Commands\n"
-        "💰 /run – Start earning\n"
-        "❌ /cancel – Stop earning\n\n"
-        "📌 Steps\n"
-        "1️⃣ Join channels\n"
-        "2️⃣ /run\n"
-        "3️⃣ Enter phone & password\n"
-        "4️⃣ Bot runs automatically\n"
+    "✨ AdView Bot – Earn Coins Automatically! ✨\n\n"
+    "🚀 Commands\n"
+    "💰 /run Earn Coins – Start earning\n"
+    "❌ /cancel To Stop Coin Earning\n\n"
+    "📌 How It Works\n"
+    "1️⃣ Join our official channel Then Register at AdView: https://adview.in/auth?ref=2QC7UR\n"
+    "2️⃣ Send /run command\n"
+    "3️⃣ Register using your AdView credentials\n"
+    "4️⃣ Bot automatically watches videos\n"
+    "5️⃣ 🎉 Coins are added to your account\n\n"
+    "⏳ Limits (Important)\n"
+    "• ⏱️ 65 videos per hour (Website limit)\n"
+    "• ⌛ Maximum 60 minutes per session\n\n"
+    "💡 Bot Developed by @bot_Yash.\n\n"
+    "🔥 Easy • Fast • Fully Automated\n\n"
     )
 
 
@@ -196,3 +202,4 @@ dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
 updater.start_polling()
 updater.idle()
+
