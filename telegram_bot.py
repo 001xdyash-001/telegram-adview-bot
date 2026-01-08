@@ -100,7 +100,15 @@ def auto_runner(bot):
             if data.get("auto"):
                 try:
                     result = run_adview(data["mobile"], data["password"])
-                    bot.send_message(chat_id=int(uid), text=result)
+
+                    bot.send_message(
+                        chat_id=int(uid),
+                        text=(
+                            "⏱ Hourly Auto Run Complete\n"
+                            f"{result}"
+                        )
+                    )
+
                 except:
                     pass
         time.sleep(3600)  # 1 hour
@@ -126,3 +134,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
