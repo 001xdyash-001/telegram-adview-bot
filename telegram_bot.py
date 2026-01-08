@@ -30,7 +30,7 @@ def join_buttons():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("🔔 Join Channel of Yash", url="https://t.me/Earning_Key")],
         [InlineKeyboardButton("🔔 Join Channel of Surbhi", url="https://t.me/surbhiscripter")],
-        [InlineKeyboardButton("🔔 Join Channel of Yash", url="https://t.me/EagletekTelegram")]
+        [InlineKeyboardButton("🔔 Join Channel of Cyrus", url="https://t.me/EagletekTelegram")]
     ])
 
 
@@ -52,7 +52,6 @@ def start(update, context):
     "• ⌛ Maximum 60 minutes per session\n\n"
     "💡 Tip: Run the bot regularly to maximize your daily earnings.\n\n"
     "🔥 Easy • Fast • Fully Automated\n\n"
-    " Special Thanks to Cyrus.\n\n"
 )
 
 def run(update, context):
@@ -149,6 +148,7 @@ dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
 updater.start_polling()
 updater.idle()
+
 
 
 
