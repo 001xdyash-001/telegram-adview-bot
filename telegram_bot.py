@@ -1,19 +1,15 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from AdviewScriptbyYash import AdViewBot
-import threading
-import os
+import threading, time, json, os
+from adview_runner import run_adview
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = 1329609274
+DATA_FILE = "users.json"
 
+# 🔔 FORCE JOIN CHANNELS (UPDATED)
 CHANNELS = ["@Earning_Key", "@surbhiscripter", "@EagletekTelegram"]
 
-USER_STATE = {}
-USER_DATA = {}
-STOP_USERS = {}
-
-# -------- FORCE JOIN --------
+# ---------- FORCE JOIN ----------
 def is_user_joined(bot, user_id):
     for ch in CHANNELS:
         try:
@@ -24,89 +20,109 @@ def is_user_joined(bot, user_id):
             return False
     return True
 
-
 def join_buttons():
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton("Join Channel 1", url="https://t.me/Earning_Key")],
-        [InlineKeyboardButton("Join Channel 2", url="https://t.me/surbhiscripter")],
-        [InlineKeyboardButton("Join Channel 3", url="https://t.me/EagletekTelegram")]
-    ])
+    keyboard = []
+    for ch in CHANNELS:
+        keyboard.append(
+            [InlineKeyboardButton(f"Join {ch}", url=f"https://t.me/{ch.lstrip('@')}")]
+        )
+    return InlineKeyboardMarkup(keyboard)
 
+# ---------- LOAD / SAVE USERS ----------
+def load_users():
+    if not os.path.exists(DATA_FILE):
+        return {}
+    with open(DATA_FILE, "r") as f:
+        return json.load(f)
 
-# -------- COMMANDS --------
+def save_users(data):
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f)
+
+USERS = load_users()
+
+# ---------- COMMANDS ----------
 def start(update, context):
-    update.message.reply_text(
-        "Welcome to AdView Bot 🚀\n\n"
-        "/run – Start earning\n"
-        "/cancel – Stop process"
-    )
-
-
-def run(update, context):
-    uid = update.message.from_user.id
+    uid = update.effective_user.id
 
     if not is_user_joined(context.bot, uid):
         update.message.reply_text(
-            "❌ Join all channels first:",
+            "❌ Join All the Channels:",
             reply_markup=join_buttons()
         )
         return
 
-    USER_STATE[uid] = "MOBILE"
-    update.message.reply_text("📱 Send mobile number")
+    update.message.reply_text(
+        "🤖 Auto AdView Bot\n\n"
+        "Steps to use: https://t.me/Earning_Key/4413\n\n"
+        "👉 Save account:\n"
+        "/save mobile password\n\n"
+        "👉 Stop auto run:\n"
+        "/stop"
+    )
 
+def save(update, context):
+    uid = update.effective_user.id
 
-def cancel(update, context):
-    uid = update.message.from_user.id
-    STOP_USERS[uid] = True
-    USER_STATE.pop(uid, None)
-    USER_DATA.pop(uid, None)
-    update.message.reply_text("🛑 Stopped")
-
-
-# -------- MESSAGE FLOW --------
-def handle_message(update, context):
-    uid = update.message.from_user.id
-    text = update.message.text
-
-    if USER_STATE.get(uid) == "MOBILE":
-        USER_DATA[uid] = {"mobile": text}
-        USER_STATE[uid] = "PASSWORD"
-        update.message.reply_text("🔒 Send password")
+    if not is_user_joined(context.bot, uid):
+        update.message.reply_text(
+            "❌ Pehle sabhi channels join karo:",
+            reply_markup=join_buttons()
+        )
         return
 
-    if USER_STATE.get(uid) == "PASSWORD":
-        password = text
-        mobile = USER_DATA[uid]["mobile"]
-        USER_STATE.pop(uid)
+    try:
+        mobile = context.args[0]
+        password = context.args[1]
 
-        try:
-            context.bot.delete_message(update.message.chat_id, update.message.message_id)
-        except:
-            pass
+        USERS[str(uid)] = {
+            "mobile": mobile,
+            "password": password,
+            "auto": True
+        }
+        save_users(USERS)
 
-        STOP_USERS[uid] = False
+        update.message.reply_text("✅ Saved. Auto run enabled (hourly).")
+    except:
+        update.message.reply_text("❌ Use: /save mobile password")
 
-        def is_stopped():
-            return STOP_USERS.get(uid, False)
+def stop(update, context):
+    uid = str(update.effective_user.id)
+    if uid in USERS:
+        USERS[uid]["auto"] = False
+        save_users(USERS)
+        update.message.reply_text("⛔ Auto run stopped")
 
-        def task():
-            bot = AdViewBot(mobile, password, is_stopped)
-            bot.run()
-            if not STOP_USERS.get(uid):
-                context.bot.send_message(uid, "✅ Session finished")
+# ---------- HOURLY RUNNER ----------
+def auto_runner(bot):
+    while True:
+        for uid, data in USERS.items():
+            if data.get("auto"):
+                try:
+                    result = run_adview(data["mobile"], data["password"])
+                    bot.send_message(chat_id=int(uid), text=result)
+                except:
+                    pass
+        time.sleep(3600)  # 1 hour
 
-        threading.Thread(target=task, daemon=True).start()
+# ---------- MAIN ----------
+def main():
+    updater = Updater(BOT_TOKEN, use_context=True)
+    dp = updater.dispatcher
 
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("save", save))
+    dp.add_handler(CommandHandler("stop", stop))
 
-# -------- BOT START --------
-updater = Updater(BOT_TOKEN, use_context=True)
-dp = updater.dispatcher
+    updater.start_polling()
 
-dp.add_handler(CommandHandler("start", start))
-dp.add_handler(CommandHandler("run", run))
-dp.add_handler(CommandHandler("cancel", cancel))
-dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+    threading.Thread(
+        target=auto_runner,
+        args=(updater.bot,),
+        daemon=True
+    ).start()
 
-updater.start_polling()
-updater.idle()
+    updater.idle()
+
+if __name__ == "__main__":
+    main()
