@@ -9,7 +9,7 @@ import os
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = 1329609274
 
-CHANNELS = ["@Earning_Key", "@surbhiscripter"]
+CHANNELS = ["@Earning_Key", "@surbhiscripter", "@EagletekTelegram"]
 STOP_USERS = {}
 USER_STATE = {}
 USER_DATA = {}
@@ -29,7 +29,8 @@ def is_user_joined(bot, user_id):
 def join_buttons():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("🔔 Join Channel of Yash", url="https://t.me/Earning_Key")],
-        [InlineKeyboardButton("🔔 Join Channel of Surbhi", url="https://t.me/surbhiscripter")]
+        [InlineKeyboardButton("🔔 Join Channel of Surbhi", url="https://t.me/surbhiscripter")],
+        [InlineKeyboardButton("🔔 Join Channel of Yash", url="https://t.me/EagletekTelegram")]
     ])
 
 
@@ -59,7 +60,7 @@ def run(update, context):
 
     if not is_user_joined(context.bot, user_id):
         update.message.reply_text(
-            "❌ Kyun Re Madharchod, Bina Channel Join kiye hi Paisa kamana Chahta hai.:",
+            "❌ Kyun Re Madharchod, Bina Channel Join kiye hi Paisa kamana Chahta hai.",
             reply_markup=join_buttons()
         )
         return
@@ -148,6 +149,7 @@ dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
 updater.start_polling()
 updater.idle()
+
 
 
 
