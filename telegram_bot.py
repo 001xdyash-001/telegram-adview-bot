@@ -6,7 +6,7 @@ from AdviewScriptbyYash import AdViewBot
 import threading, time
 
 import os
-BOT_TOKEN = os.getenv("6049723451:AAEPUO1pVvWWeVKSM0erHq_89jQ-ntcpTKM")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = 1329609274
 
 CHANNELS = ["@Earning_Key", "@surbhiscripter"]
@@ -148,4 +148,5 @@ dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
 updater.start_polling()
 updater.idle()
+
 
