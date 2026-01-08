@@ -5,6 +5,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from AdviewScriptbyYash import AdViewBot
 import threading
 import os
+import time
+
 
 # ================= CONFIG =================
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -200,6 +202,13 @@ dp.add_handler(CommandHandler("cancel", cancel))
 dp.add_handler(CommandHandler("broadcast", broadcast))
 dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
+def keep_alive():
+    while True:
+        time.sleep(30)
+
+threading.Thread(target=keep_alive, daemon=True).start()
+
 updater.start_polling()
 updater.idle()
+
 
